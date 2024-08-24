@@ -18,7 +18,7 @@ async function loadEventsFromDirectory(client: CustomClient, directoryPath: stri
 async function loadEvent(client: CustomClient, filePath: string): Promise<void> {
     const { default: event } = await import(filePath);
 
-    if (!event.name || typeof event.execute !== 'function') {
+    if (!event?.name || typeof event?.execute !== 'function') {
         throw new Error(`The event in ${filePath} is missing a name or execute function.`);
     }
 
@@ -33,5 +33,5 @@ export default async function(client: CustomClient): Promise<void> {
     const foldersPath = path.join(process.cwd(), 'src/events');
     await loadEventsFromDirectory(client, foldersPath)
         .then(() => console.log(`Events loaded successfully.`))
-        .catch(error => console.error('Failed to load events:', error));
+        .catch(error => console.error('Failed to load events: ', error));
 }

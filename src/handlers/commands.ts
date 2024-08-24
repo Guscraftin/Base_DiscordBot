@@ -28,12 +28,12 @@ async function loadCommand(filePath: string): Promise<void> {
 }
 
 function isValidCommand(command: any): command is CustomSlashCommandInteraction {
-    return command.data instanceof SlashCommandBuilder && typeof command.execute === 'function';
+    return command?.data instanceof SlashCommandBuilder && typeof command?.execute === 'function';
 }
 
 export default async function(): Promise<void> {
     const foldersPath = path.join(process.cwd(), 'src/commands');
     await loadCommandsFromDirectory(foldersPath)
         .then(() => console.log(`Commands loaded successfully.`))
-        .catch(error => console.error('Failed to load commands:', error));
+        .catch(error => console.error('Failed to load commands: ', error));
 }
