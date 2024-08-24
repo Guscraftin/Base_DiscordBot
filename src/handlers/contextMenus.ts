@@ -1,7 +1,7 @@
 import { client } from '../bot';
 import fs from 'fs/promises';
 import path from 'path';
-import CustomContextMenuCommandInteraction from 'interfaces/contextMenus';
+import CustomContextMenuCommandInteraction from 'interfaces/contextMenu';
 import { ContextMenuCommandBuilder } from 'discord.js';
 
 async function loadContextMenusFromDirectory(directoryPath: string): Promise<void> {
@@ -28,12 +28,12 @@ async function loadContextMenu(filePath: string): Promise<void> {
 }
 
 function isValidContextMenu(contextMenu: any): contextMenu is CustomContextMenuCommandInteraction {
-    return contextMenu.data instanceof ContextMenuCommandBuilder && typeof contextMenu.execute === 'function';
+    return contextMenu?.data instanceof ContextMenuCommandBuilder && typeof contextMenu?.execute === 'function';
 }
 
 export default async function(): Promise<void> {
     const foldersPath = path.join(process.cwd(), 'src/contextMenus');
     await loadContextMenusFromDirectory(foldersPath)
         .then(() => console.log(`ContextMenus loaded successfully.`))
-        .catch(error => console.error('Failed to load contextMenus:', error));
+        .catch(error => console.error('Failed to load contextMenus: ', error));
 }
