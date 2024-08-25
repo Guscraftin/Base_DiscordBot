@@ -59,9 +59,9 @@ export default {
                     throw new Error(`No button matching ${interaction.customId} was found.`);
                 }
 
-                // if (button.deferOptions) {
-                //     await interaction.deferReply(button.deferOptions);
-                // }
+                if (button.deferOptions) {
+                    await interaction.deferReply(button.deferOptions);
+                }
 
                 await (button as CustomButtonInteraction).execute(client, interaction);
                 
@@ -82,9 +82,9 @@ export default {
                     throw new Error(`No modal matching ${interaction.customId} was found.`);
                 }
 
-                // if (modal.deferOptions) {
-                //     await interaction.deferReply(modal.deferOptions);
-                // }
+                if (modal.deferOptions) {
+                    await interaction.deferReply(modal.deferOptions);
+                }
 
                 await (modal as CustomModalInteraction).execute(client, interaction);
                 
@@ -105,9 +105,9 @@ export default {
                     throw new Error(`No selectMenu matching ${interaction.customId} was found.`);
                 }
 
-                // if (selectMenu.deferOptions) {
-                //     await interaction.deferReply(selectMenu.deferOptions);
-                // }
+                if (selectMenu.deferOptions) {
+                    await interaction.deferReply(selectMenu.deferOptions);
+                }
 
                 await (selectMenu as CustomStringSelectMenuInteraction).execute(client, interaction);
                 

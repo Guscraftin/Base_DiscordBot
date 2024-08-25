@@ -2,6 +2,7 @@ import { CustomClient } from 'bot';
 import { ChatInputCommandInteraction, EmbedBuilder, User, Team, SlashCommandBuilder } from 'discord.js';
 
 export = {
+    deferOptions: { ephemeral: false },
     data: new SlashCommandBuilder()
         .setName("info")
         .setDescription("Afficher les informations du bot.")
@@ -11,7 +12,7 @@ export = {
         const owners = await getOwnersList(interaction);
         const embed = createBotInfoEmbed(botUser, interaction, owners);
 
-        return interaction.reply({ embeds: [embed] });
+        return interaction.editReply({ embeds: [embed] });
     },
 };
 

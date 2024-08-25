@@ -3,6 +3,7 @@ import { ChatInputCommandInteraction } from "discord.js";
 import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder } from 'discord.js';
 
 module.exports = {
+    deferOptions: { ephemeral: true },
     data: new SlashCommandBuilder()
         .setName("test")
         .setDescription("Permet de tester les différents composants.")
@@ -13,9 +14,8 @@ module.exports = {
         const selectMenuRow = createSelectMenuRow();
         const embed = createEmbed(interaction);
 
-        await interaction.reply({
+        await interaction.editReply({
             content: 'Test des composants',
-            ephemeral: true,
             embeds: [embed],
             components: [buttonRow, selectMenuRow]
         });

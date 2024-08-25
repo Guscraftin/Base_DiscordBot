@@ -1,9 +1,10 @@
+import CustomBaseInteraction from './baseInteraction';
 import { CustomClient } from 'bot';
 import {
     StringSelectMenuInteraction,
 } from 'discord.js';
 
-export default interface CustomStringSelectMenuInteraction {
+export default interface CustomStringSelectMenuInteraction extends CustomBaseInteraction {
     data: {
         name: string;
     };
