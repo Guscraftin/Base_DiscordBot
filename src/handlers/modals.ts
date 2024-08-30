@@ -22,11 +22,11 @@ async function loadModal(filePath: string): Promise<void> {
     if (isValidModal(modal)) {
         client.modals.set(modal.data.name, modal);
     } else {
-        console.log(`[WARNING] The modal at ${filePath} is missing a required "data" or "execute" property.`);
+        throw new Error(`[WARNING] The modal at ${filePath} is missing a required "data" or "execute" property.`);
     }
 }
 
-function isValidModal(modal: any): modal is CustomModalInteraction {
+function isValidModal(modal: CustomModalInteraction): modal is CustomModalInteraction {
     return typeof modal?.data?.name === 'string' && typeof modal?.execute === 'function';
 }
 

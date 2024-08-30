@@ -23,11 +23,11 @@ async function loadContextMenu(filePath: string): Promise<void> {
     if (isValidContextMenu(contextMenu)) {
         client.contextMenus.set(contextMenu.data.name, contextMenu);
     } else {
-        console.log(`[WARNING] The contextMenu at ${filePath} is missing a required "data" or "execute" property.`);
+        throw new Error(`[WARNING] The contextMenu at ${filePath} is missing a required "data" or "execute" property.`);
     }
 }
 
-function isValidContextMenu(contextMenu: any): contextMenu is CustomContextMenuCommandInteraction {
+function isValidContextMenu(contextMenu: CustomContextMenuCommandInteraction): contextMenu is CustomContextMenuCommandInteraction {
     return contextMenu?.data instanceof ContextMenuCommandBuilder && typeof contextMenu?.execute === 'function';
 }
 

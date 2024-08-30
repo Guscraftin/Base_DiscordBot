@@ -22,11 +22,11 @@ async function loadButton(filePath: string): Promise<void> {
     if (isValidButton(button)) {
         client.buttons.set(button.data.name, button);
     } else {
-        console.log(`[WARNING] The button at ${filePath} is missing a required "data" or "execute" property.`);
+        throw new Error(`[WARNING] The button at ${filePath} is missing a required "data" or "execute" property.`);
     }
 }
 
-function isValidButton(button: any): button is CustomButtonInteraction {
+function isValidButton(button: CustomButtonInteraction): button is CustomButtonInteraction {
     return typeof button?.data?.name === 'string' && typeof button?.execute === 'function';
 }
 

@@ -36,16 +36,16 @@ export async function deployCommands(client: CustomClient) {
 
 
             // Deploy our commands to a specific guild
-            const data: any[] = await rest.put(
+            const data: unknown[] = await rest.put(
                 Routes.applicationGuildCommands(clientId, guildId),
                 { body: commandsList },
-            ) as any[];            
+            ) as unknown[];            
 
             // Deploy our commands globally
-            // const data: any[] = await rest.put(
+            // const data: unknown[] = await rest.put(
             //     Routes.applicationCommands(clientId),
             //     { body: commandsList },
-            // ) as any[];
+            // ) as unknown[];
     
             console.log(`Successfully reloaded ${data.length} application (/) commands.`);
         } catch (error) {

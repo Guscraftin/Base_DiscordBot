@@ -23,11 +23,11 @@ async function loadCommand(filePath: string): Promise<void> {
     if (isValidCommand(command)) {
         client.commands.set(command.data.name, command);
     } else {
-        console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+        throw new Error(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
     }
 }
 
-function isValidCommand(command: any): command is CustomSlashCommandInteraction {
+function isValidCommand(command: CustomSlashCommandInteraction): command is CustomSlashCommandInteraction {
     return command?.data instanceof SlashCommandBuilder && typeof command?.execute === 'function';
 }
 

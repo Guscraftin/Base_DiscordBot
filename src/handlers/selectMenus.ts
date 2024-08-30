@@ -1,7 +1,6 @@
 import { client } from '../bot';
 import fs from 'fs/promises';
 import path from 'path';
-import CustomModalInteraction from 'interfaces/modal';
 import CustomStringSelectMenuInteraction from 'interfaces/selectMenu';
 
 async function loadSelectMenusFromDirectory(directoryPath: string): Promise<void> {
@@ -23,11 +22,11 @@ async function loadSelectMenu(filePath: string): Promise<void> {
     if (isValidSelectMenu(selectMenu)) {
         client.selectMenus.set(selectMenu.data.name, selectMenu);
     } else {
-        console.log(`[WARNING] The selectMenu at ${filePath} is missing a required "data" or "execute" property.`);
+        throw new Error(`[WARNING] The selectMenu at ${filePath} is missing a required "data" or "execute" property.`);
     }
 }
 
-function isValidSelectMenu(selectMenu: any): selectMenu is CustomStringSelectMenuInteraction {
+function isValidSelectMenu(selectMenu: CustomStringSelectMenuInteraction): selectMenu is CustomStringSelectMenuInteraction {
     return typeof selectMenu?.data?.name === 'string' && typeof selectMenu?.execute === 'function';
 }
 

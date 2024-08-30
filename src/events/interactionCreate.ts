@@ -25,7 +25,7 @@ function checkPermissions(interaction: BaseInteraction, botInteraction: CustomBa
 
     const missingPermissions = interaction.appPermissions.missing(botInteraction.botPermissions);
     if (missingPermissions.length) {
-        return `Here are the permissions the bot needs to correctly execute your interaction: \`${missingPermissions.join('\`, \`')}\``;
+        return `Here are the permissions the bot needs to correctly execute your interaction: \`${missingPermissions.join('`, `')}\``;
     }
 }
 
@@ -58,11 +58,11 @@ async function handleCommandInteraction(interaction: ChatInputCommandInteraction
     }
 }
 
-function isContextMenuCommandInteraction(interaction: any): interaction is ContextMenuCommandInteraction {
+function isContextMenuCommandInteraction(interaction: unknown): interaction is ContextMenuCommandInteraction {
     return interaction instanceof ContextMenuCommandInteraction;
 }
 
-function isSlashCommandInteraction(interaction: any): interaction is ChatInputCommandInteraction {
+function isSlashCommandInteraction(interaction: unknown): interaction is ChatInputCommandInteraction {
     return interaction instanceof ChatInputCommandInteraction;
 }
 

@@ -1,4 +1,5 @@
 import { CustomClient } from 'bot';
+import { ClientEvents } from 'discord.js';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -23,9 +24,9 @@ async function loadEvent(client: CustomClient, filePath: string): Promise<void> 
     }
 
     if (event.once) {
-		client.once(event.name, (...args: any[]) => event.execute(...args));
+		client.once(event.name, (...args: ClientEvents[]) => event.execute(...args));
 	} else {
-		client.on(event.name, (...args: any[]) => event.execute(...args));
+		client.on(event.name, (...args: ClientEvents[]) => event.execute(...args));
 	}
 }
 
