@@ -5,7 +5,7 @@ export = {
     deferOptions: { ephemeral: false },
     data: new SlashCommandBuilder()
         .setName("info")
-        .setDescription("Afficher les informations du bot.")
+        .setDescription("Display bot information.")
         .setDMPermission(true),
     async execute(client: CustomClient, interaction: ChatInputCommandInteraction) {
         const botUser = interaction.client.user;
@@ -30,16 +30,16 @@ async function getOwnersList(interaction: ChatInputCommandInteraction): Promise<
 
 function createBotInfoEmbed(botUser: User, interaction: ChatInputCommandInteraction, owners: string): EmbedBuilder {
     return new EmbedBuilder()
-        .setTitle('Information sur le bot :')
+        .setTitle('Bot information:')
         .setAuthor({ name: botUser.username, iconURL: botUser.displayAvatarURL() })
         .setThumbnail(botUser.displayAvatarURL())
         .setURL('https://apprendre-discord.fr')
-        .setDescription("J'ai été créé dans le but d'aider un maximum de personne sur discord.")
+        .setDescription("I was created to help as many people as possible on discord.")
         .addFields(
-            { name: 'Date de création', value: `<t:${Math.floor(botUser.createdTimestamp / 1000)}:R>`, inline: true },
-            { name: 'En ligne depuis', value: `<t:${Math.floor(interaction.client.readyTimestamp / 1000)}:f>`, inline: true },
-            { name: 'Propriétaire(s) :', value: owners, inline: true },
-            { name: 'Mes développeurs :', value: `▸ [Guscraftin](https://github.com/Guscraftin)`, inline: true },
+            { name: 'Creation date:', value: `<t:${Math.floor(botUser.createdTimestamp / 1000)}:R>`, inline: true },
+            { name: 'Online since', value: `<t:${Math.floor(interaction.client.readyTimestamp / 1000)}:f>`, inline: true },
+            { name: 'Owner(s):', value: owners, inline: true },
+            { name: 'My developers:', value: `▸ [Guscraftin](https://github.com/Guscraftin)`, inline: true },
         )
         .setColor('DarkAqua')
         .setTimestamp()

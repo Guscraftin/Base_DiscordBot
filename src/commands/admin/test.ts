@@ -6,7 +6,7 @@ module.exports = {
     deferOptions: { ephemeral: true },
     data: new SlashCommandBuilder()
         .setName("test")
-        .setDescription("Permet de tester les différents composants.")
+        .setDescription("Allows you to test individual components.")
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false),
     async execute(client: CustomClient, interaction: ChatInputCommandInteraction) {
@@ -15,7 +15,7 @@ module.exports = {
         const embed = createEmbed(interaction);
 
         await interaction.editReply({
-            content: 'Test des composants',
+            content: 'Component testing',
             embeds: [embed],
             components: [buttonRow, selectMenuRow]
         });
@@ -27,7 +27,7 @@ function createButtonRow(): ActionRowBuilder<ButtonBuilder> {
         .addComponents(
             new ButtonBuilder()
                 .setCustomId('test')
-                .setLabel('Lancer le modal !')
+                .setLabel('Launch the modal!')
                 .setStyle(ButtonStyle.Primary)
                 .setEmoji('🚧'),
         );
@@ -38,16 +38,16 @@ function createSelectMenuRow(): ActionRowBuilder<StringSelectMenuBuilder> {
         .addComponents(
             new StringSelectMenuBuilder()
                 .setCustomId('test_selectMenu')
-                .setPlaceholder('Sélectionnez une option')
+                .setPlaceholder('Select an option')
                 .addOptions(
                     {
-                        label: 'Choisissez-moi',
-                        description: 'Voici une description',
+                        label: 'Choose me',
+                        description: 'Here\'s a description',
                         value: 'first_option',
                     },
                     {
-                        label: 'Choisissez-moi aussi',
-                        description: 'Voici une autre description',
+                        label: 'Choose me too',
+                        description: 'Here\'s another description',
                         value: 'second_option',
                     },
                 ),
@@ -57,7 +57,7 @@ function createSelectMenuRow(): ActionRowBuilder<StringSelectMenuBuilder> {
 function createEmbed(interaction: ChatInputCommandInteraction): EmbedBuilder {
     return new EmbedBuilder()
         .setTitle('Embed Test')
-        .setDescription("Voici un bouton ci dessous qui doit répondre une phrase.")
+        .setDescription("Here's a button to answer a sentence.")
         .setColor('DarkAqua')
         .setTimestamp()
         .setFooter({ text: interaction.user.username, iconURL: interaction.user.displayAvatarURL() });

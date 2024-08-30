@@ -9,6 +9,6 @@ export = {
     async execute(client: CustomClient, interaction: ModalSubmitInteraction) {
         const newTest = interaction.fields?.getTextInputValue("newTest");
         
-        return interaction.editReply({ content: `Le bouton et le modal sont concluant : \`${newTest}\`` });
+        return interaction.editReply({ content: `Button and modal are conclusive: \`${newTest}\`` });
     }
 }

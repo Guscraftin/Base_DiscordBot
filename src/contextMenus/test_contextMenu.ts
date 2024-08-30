@@ -14,6 +14,6 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false),
     async execute(client: CustomClient, interaction: ContextMenuCommandInteraction) {
-        return interaction.editReply({ content: "Voici le menu contextuel test qui fonctionne correctement !" });
+        return interaction.editReply({ content: "Here's a test contextual menu that works properly!" });
     }
 }

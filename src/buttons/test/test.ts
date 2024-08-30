@@ -8,14 +8,14 @@ module.exports = {
     async execute(client: CustomClient, interaction: ButtonInteraction) {
         const modal = new ModalBuilder()
             .setCustomId("test_modal")
-            .setTitle("Tester les modals !");
+            .setTitle("Testing modals!");
 
         const newNameInput = new TextInputBuilder()
             .setCustomId("newTest")
-            .setLabel("Ce test est concluant ?")
+            .setLabel("Is this test conclusive?")
             .setMinLength(1)
             .setMaxLength(32)
-            .setPlaceholder("Tape ta réponse ici !")
+            .setPlaceholder("Type your answer here!")
             .setStyle(TextInputStyle.Short);
 
         modal.addComponents(new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(newNameInput));

@@ -9,11 +9,11 @@ module.exports = {
     async execute(client: CustomClient, interaction: StringSelectMenuInteraction) {
         switch (interaction.values[0]) {
             case "first_option":
-                return interaction.editReply({ content: "Vous avez choisi la première option !" });
+                return interaction.editReply({ content: "You chose the first option!" });
             case "second_option":
-                return interaction.editReply({ content: "Vous avez choisi la deuxième option !" });
+                return interaction.editReply({ content: "You chose the second option!" });
             default:
-                return interaction.editReply({ content: "Vous n'avez pas choisi d'option !" });
+                return interaction.editReply({ content: "You haven't chosen an option!" });
         }
     }
 }
