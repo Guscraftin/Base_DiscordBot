@@ -1,5 +1,12 @@
+import {
+    ActionRowBuilder,
+    ButtonInteraction,
+    ModalActionRowComponentBuilder,
+    ModalBuilder,
+    TextInputBuilder,
+    TextInputStyle
+} from "discord.js";
 import { CustomClient } from "bot";
-import { ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle, ButtonInteraction, ModalActionRowComponentBuilder } from "discord.js";
 
 module.exports = {
     data: {
@@ -10,16 +17,18 @@ module.exports = {
             .setCustomId("test_modal")
             .setTitle("Testing modals!");
 
+        const minCharacters = 1;
+        const maxCharacters = 32;
         const newNameInput = new TextInputBuilder()
             .setCustomId("newTest")
             .setLabel("Is this test conclusive?")
-            .setMinLength(1)
-            .setMaxLength(32)
+            .setMinLength(minCharacters)
+            .setMaxLength(maxCharacters)
             .setPlaceholder("Type your answer here!")
             .setStyle(TextInputStyle.Short);
 
         modal.addComponents(new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(newNameInput));
 
-        return interaction.showModal(modal);
+        return await interaction.showModal(modal);
     }
 }

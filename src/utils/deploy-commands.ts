@@ -1,9 +1,10 @@
-import { CustomClient } from 'bot';
 import {
-    REST, Routes,
+    REST,
+    RESTPostAPIChatInputApplicationCommandsJSONBody,
     RESTPostAPIContextMenuApplicationCommandsJSONBody,
-    RESTPostAPIChatInputApplicationCommandsJSONBody
+    Routes,
 } from 'discord.js';
+import { CustomClient } from 'bot';
 
 
 function getCommandsList(client: CustomClient) {
@@ -19,7 +20,7 @@ export async function deployCommands(client: CustomClient) {
         throw new Error("DISCORD_TOKEN environment variable is not defined.");
     }
     const rest = new REST({ version: '10' }).setToken(discordToken);
-    (async () => {
+    await (async () => {
         try {
             const commandsList = getCommandsList(client);
             console.log(`Started refreshing ${commandsList.length} application (/) commands.`);
@@ -34,7 +35,6 @@ export async function deployCommands(client: CustomClient) {
                 throw new Error("GUILD_ID environment variable is not defined.");
             }
 
-
             // Deploy our commands to a specific guild
             const data: unknown[] = await rest.put(
                 Routes.applicationGuildCommands(clientId, guildId),
@@ -42,6 +42,7 @@ export async function deployCommands(client: CustomClient) {
             ) as unknown[];            
 
             // Deploy our commands globally
+            // eslint-disable-next-line capitalized-comments
             // const data: unknown[] = await rest.put(
             //     Routes.applicationCommands(clientId),
             //     { body: commandsList },
@@ -49,7 +50,7 @@ export async function deployCommands(client: CustomClient) {
     
             console.log(`Successfully reloaded ${data.length} application (/) commands.`);
         } catch (error) {
-            console.error("Failed to deploy commands: " + error);
+            console.error(`Failed to deploy commands: ${error}`);
         }
     })();
 }

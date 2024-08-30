@@ -1,10 +1,3 @@
-import CustomSlashCommandInteraction from 'interfaces/command';
-import CustomContextMenuCommandInteraction from 'interfaces/contextMenu';
-import CustomButtonInteraction from 'interfaces/button';
-import CustomModalInteraction from 'interfaces/modal';
-import CustomStringSelectMenuInteraction from 'interfaces/selectMenu';
-import CustomBaseInteraction from 'interfaces/baseInteraction';
-import { client } from '../bot';
 import {
     ApplicationCommandType,
     BaseInteraction,
@@ -16,9 +9,18 @@ import {
     ModalSubmitInteraction,
     StringSelectMenuInteraction
 } from 'discord.js';
+import CustomBaseInteraction from 'interfaces/baseInteraction';
+import CustomButtonInteraction from 'interfaces/button';
+import CustomContextMenuCommandInteraction from 'interfaces/contextMenu';
+import CustomModalInteraction from 'interfaces/modal';
+import CustomSlashCommandInteraction from 'interfaces/command';
+import CustomStringSelectMenuInteraction from 'interfaces/selectMenu';
+import { client } from '../bot';
 
-function checkPermissions(interaction: BaseInteraction, botInteraction: CustomBaseInteraction): string | void {
-    if (!botInteraction.botPermissions) return;
+function checkPermissions(interaction: BaseInteraction, botInteraction: CustomBaseInteraction): string {
+    if (!botInteraction.botPermissions) {
+        return "";
+    }
     if (!interaction.appPermissions) {
         return 'The bot lacks permissions. Please contact an administrator of this server.';
     }
@@ -27,9 +29,19 @@ function checkPermissions(interaction: BaseInteraction, botInteraction: CustomBa
     if (missingPermissions.length) {
         return `Here are the permissions the bot needs to correctly execute your interaction: \`${missingPermissions.join('`, `')}\``;
     }
+
+    return "";
 }
 
-async function handleCommandInteraction(interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction) {
+function isContextMenuCommandInteraction(interaction: unknown): interaction is ContextMenuCommandInteraction {
+    return interaction instanceof ContextMenuCommandInteraction;
+}
+
+function isSlashCommandInteraction(interaction: unknown): interaction is ChatInputCommandInteraction {
+    return interaction instanceof ChatInputCommandInteraction;
+}
+
+async function handleCommandInteraction(interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction): Promise<void> {
     const command = client.commands.get(interaction.commandName) || client.contextMenus.get(interaction.commandName);
     
     try {        
@@ -38,15 +50,20 @@ async function handleCommandInteraction(interaction: ChatInputCommandInteraction
         }
 
         const returnPermission = checkPermissions(interaction, command);
-        if (returnPermission) return interaction.reply({ content: returnPermission, ephemeral: true });
-        if (command.deferOptions) await interaction.deferReply(command.deferOptions);
+        if (returnPermission) {
+            await interaction.reply({ content: returnPermission, ephemeral: true });
+            return;
+        }
+        if (command.deferOptions) {
+            await interaction.deferReply(command.deferOptions);
+        }
 
         if (isContextMenuCommandInteraction(interaction)) {
             await (command as CustomContextMenuCommandInteraction).execute(client, interaction);
         } else if (isSlashCommandInteraction(interaction)) {
             await (command as CustomSlashCommandInteraction).execute(client, interaction);
         } else {
-            throw new Error("This command interaction is not valid: " + interaction);
+            throw new Error(`This command interaction is not valid: ${  interaction}`);
         }
     } catch (error) {
         console.error(error);
@@ -58,14 +75,6 @@ async function handleCommandInteraction(interaction: ChatInputCommandInteraction
     }
 }
 
-function isContextMenuCommandInteraction(interaction: unknown): interaction is ContextMenuCommandInteraction {
-    return interaction instanceof ContextMenuCommandInteraction;
-}
-
-function isSlashCommandInteraction(interaction: unknown): interaction is ChatInputCommandInteraction {
-    return interaction instanceof ChatInputCommandInteraction;
-}
-
 async function handleContextMenuCommandInteraction(interaction: ContextMenuCommandInteraction) {
     await handleCommandInteraction(interaction);
 }
@@ -74,7 +83,7 @@ async function handleSlashCommandInteraction(interaction: ChatInputCommandIntera
     await handleCommandInteraction(interaction);
 }
 
-async function handleButtonInteraction(interaction: ButtonInteraction) {
+async function handleButtonInteraction(interaction: ButtonInteraction): Promise<void> {
     const button = client.buttons.get(interaction.customId);
     
     try {
@@ -83,7 +92,10 @@ async function handleButtonInteraction(interaction: ButtonInteraction) {
         }
 
         const returnPermission = checkPermissions(interaction, button);
-        if (returnPermission) return interaction.reply({ content: returnPermission, ephemeral: true });
+        if (returnPermission) {
+            await interaction.reply({ content: returnPermission, ephemeral: true });
+            return;
+        }
         if (button.deferOptions) {
             await interaction.deferReply(button.deferOptions);
         }
@@ -99,7 +111,7 @@ async function handleButtonInteraction(interaction: ButtonInteraction) {
     }
 }
 
-async function handleModalInteraction(interaction: ModalSubmitInteraction) {
+async function handleModalInteraction(interaction: ModalSubmitInteraction): Promise<void> {
     const modal = client.modals.get(interaction.customId);
 
     try {
@@ -108,7 +120,10 @@ async function handleModalInteraction(interaction: ModalSubmitInteraction) {
         }
 
         const returnPermission = checkPermissions(interaction, modal);
-        if (returnPermission) return interaction.reply({ content: returnPermission, ephemeral: true });
+        if (returnPermission) {
+            await interaction.reply({ content: returnPermission, ephemeral: true });
+            return;
+        }
         if (modal.deferOptions) {
             await interaction.deferReply(modal.deferOptions);
         }
@@ -124,7 +139,7 @@ async function handleModalInteraction(interaction: ModalSubmitInteraction) {
     }
 }
 
-async function handleSelectMenuInteraction(interaction: StringSelectMenuInteraction) {
+async function handleSelectMenuInteraction(interaction: StringSelectMenuInteraction): Promise<void> {
     const selectMenu = client.selectMenus.get(interaction.customId);
 
     try {
@@ -133,7 +148,10 @@ async function handleSelectMenuInteraction(interaction: StringSelectMenuInteract
         }
 
         const returnPermission = checkPermissions(interaction, selectMenu);
-        if (returnPermission) return interaction.reply({ content: returnPermission, ephemeral: true });
+        if (returnPermission) {
+            await interaction.reply({ content: returnPermission, ephemeral: true });
+            return;
+        }
         if (selectMenu.deferOptions) {
             await interaction.deferReply(selectMenu.deferOptions);
         }
@@ -150,13 +168,12 @@ async function handleSelectMenuInteraction(interaction: StringSelectMenuInteract
 }
 
 export default {
-    name: Events.InteractionCreate,
     execute: async (interaction: BaseInteraction) => {
         if (interaction.isCommand()) {
             if (interaction.commandType === ApplicationCommandType.ChatInput)
-                await handleSlashCommandInteraction(interaction as ChatInputCommandInteraction);
+                {await handleSlashCommandInteraction(interaction as ChatInputCommandInteraction);}
             else
-                await handleContextMenuCommandInteraction(interaction as ContextMenuCommandInteraction);
+            {await handleContextMenuCommandInteraction(interaction as ContextMenuCommandInteraction);}
         } else if (interaction.isButton()) {
             await handleButtonInteraction(interaction);
         } else if (interaction.isModalSubmit()) {
@@ -164,7 +181,8 @@ export default {
         } else if (interaction.isStringSelectMenu()) {
             await handleSelectMenuInteraction(interaction);
         } else {
-            console.error(`This event of type "${InteractionType[interaction.type]}" is not handled in interactionCreate event. InteractionId: ` + interaction);
+            console.error(`This event of type "${InteractionType[interaction.type]}" is not handled in interactionCreate event. InteractionId: ${  interaction}`);
         }
-    }
+    },
+    name: Events.InteractionCreate,
 };

@@ -1,9 +1,9 @@
-import CustomBaseInteraction from './baseInteraction';
-import { CustomClient } from 'bot';
 import {
     ContextMenuCommandBuilder,
     ContextMenuCommandInteraction
 } from 'discord.js';
+import CustomBaseInteraction from './baseInteraction';
+import { CustomClient } from 'bot';
 
 export default interface CustomContextMenuCommandInteraction extends CustomBaseInteraction {
     data: ContextMenuCommandBuilder;

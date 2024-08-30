@@ -1,7 +1,21 @@
+import CustomStringSelectMenuInteraction from 'interfaces/selectMenu';
 import { client } from '../bot';
 import fs from 'fs/promises';
 import path from 'path';
-import CustomStringSelectMenuInteraction from 'interfaces/selectMenu';
+
+function isValidSelectMenu(selectMenu: CustomStringSelectMenuInteraction): selectMenu is CustomStringSelectMenuInteraction {
+    return typeof selectMenu?.data?.name === 'string' && typeof selectMenu?.execute === 'function';
+}
+
+async function loadSelectMenu(filePath: string): Promise<void> {
+    const { default: selectMenu } = await import(filePath);
+
+    if (isValidSelectMenu(selectMenu)) {
+        client.selectMenus.set(selectMenu.data.name, selectMenu);
+    } else {
+        throw new Error(`[WARNING] The selectMenu at ${filePath} is missing a required "data" or "execute" property.`);
+    }
+}
 
 async function loadSelectMenusFromDirectory(directoryPath: string): Promise<void> {
     const files = await fs.readdir(directoryPath, { withFileTypes: true });
@@ -16,21 +30,7 @@ async function loadSelectMenusFromDirectory(directoryPath: string): Promise<void
     }
 }
 
-async function loadSelectMenu(filePath: string): Promise<void> {
-    const { default: selectMenu } = await import(filePath);
-
-    if (isValidSelectMenu(selectMenu)) {
-        client.selectMenus.set(selectMenu.data.name, selectMenu);
-    } else {
-        throw new Error(`[WARNING] The selectMenu at ${filePath} is missing a required "data" or "execute" property.`);
-    }
-}
-
-function isValidSelectMenu(selectMenu: CustomStringSelectMenuInteraction): selectMenu is CustomStringSelectMenuInteraction {
-    return typeof selectMenu?.data?.name === 'string' && typeof selectMenu?.execute === 'function';
-}
-
-export default async function(): Promise<void> {
+export default async function handleSelectMenus(): Promise<void> {
     const foldersPath = path.join(process.cwd(), 'src/selectMenus');
     await loadSelectMenusFromDirectory(foldersPath)
         .then(() => console.log(`SelectMenus loaded successfully.`))

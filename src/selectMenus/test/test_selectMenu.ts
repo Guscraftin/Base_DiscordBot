@@ -1,20 +1,21 @@
-import { CustomClient } from "bot";
 import { PermissionFlagsBits, StringSelectMenuInteraction } from "discord.js";
+import { CustomClient } from "bot";
 
 module.exports = {
     botPermissions: [PermissionFlagsBits.AttachFiles],
-    deferOptions: { ephemeral: true },
     data: {
         name: "test_selectMenu",
     },
+    deferOptions: { ephemeral: true },
     async execute(client: CustomClient, interaction: StringSelectMenuInteraction) {
-        switch (interaction.values[0]) {
+        const first = 0;
+        switch (interaction.values[first]) {
             case "first_option":
-                return interaction.editReply({ content: "You chose the first option!" });
+                return await interaction.editReply({ content: "You chose the first option!" });
             case "second_option":
-                return interaction.editReply({ content: "You chose the second option!" });
+                return await interaction.editReply({ content: "You chose the second option!" });
             default:
-                return interaction.editReply({ content: "You haven't chosen an option!" });
+                return await interaction.editReply({ content: "You haven't chosen an option!" });
         }
     }
 }

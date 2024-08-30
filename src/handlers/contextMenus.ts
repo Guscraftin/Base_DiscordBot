@@ -1,8 +1,22 @@
+import { ContextMenuCommandBuilder } from 'discord.js';
+import CustomContextMenuCommandInteraction from 'interfaces/contextMenu';
 import { client } from '../bot';
 import fs from 'fs/promises';
 import path from 'path';
-import CustomContextMenuCommandInteraction from 'interfaces/contextMenu';
-import { ContextMenuCommandBuilder } from 'discord.js';
+
+function isValidContextMenu(contextMenu: CustomContextMenuCommandInteraction): contextMenu is CustomContextMenuCommandInteraction {
+    return contextMenu?.data instanceof ContextMenuCommandBuilder && typeof contextMenu?.execute === 'function';
+}
+
+async function loadContextMenu(filePath: string): Promise<void> {
+    const { default: contextMenu } = await import(filePath);
+
+    if (isValidContextMenu(contextMenu)) {
+        client.contextMenus.set(contextMenu.data.name, contextMenu);
+    } else {
+        throw new Error(`[WARNING] The contextMenu at ${filePath} is missing a required "data" or "execute" property.`);
+    }
+}
 
 async function loadContextMenusFromDirectory(directoryPath: string): Promise<void> {
     const files = await fs.readdir(directoryPath, { withFileTypes: true });
@@ -17,21 +31,7 @@ async function loadContextMenusFromDirectory(directoryPath: string): Promise<voi
     }
 }
 
-async function loadContextMenu(filePath: string): Promise<void> {
-    const { default: contextMenu } = await import(filePath);
-
-    if (isValidContextMenu(contextMenu)) {
-        client.contextMenus.set(contextMenu.data.name, contextMenu);
-    } else {
-        throw new Error(`[WARNING] The contextMenu at ${filePath} is missing a required "data" or "execute" property.`);
-    }
-}
-
-function isValidContextMenu(contextMenu: CustomContextMenuCommandInteraction): contextMenu is CustomContextMenuCommandInteraction {
-    return contextMenu?.data instanceof ContextMenuCommandBuilder && typeof contextMenu?.execute === 'function';
-}
-
-export default async function(): Promise<void> {
+export default async function handleContextMenus(): Promise<void> {
     const foldersPath = path.join(process.cwd(), 'src/contextMenus');
     await loadContextMenusFromDirectory(foldersPath)
         .then(() => console.log(`ContextMenus loaded successfully.`))

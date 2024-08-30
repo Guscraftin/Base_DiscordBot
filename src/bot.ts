@@ -1,10 +1,10 @@
 import { Client, Collection } from 'discord.js';
-import { deployCommands } from './utils/deploy-commands';
 import CustomButtonInteraction from 'interfaces/button';
 import CustomContextMenuCommandInteraction from 'interfaces/contextMenu';
 import CustomModalInteraction from 'interfaces/modal';
 import CustomSlashCommandInteraction from 'interfaces/command';
 import CustomStringSelectMenuInteraction from 'interfaces/selectMenu';
+import { deployCommands } from './utils/deploy-commands';
 import dotenv from 'dotenv';
 dotenv.config();
 

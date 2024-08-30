@@ -1,20 +1,11 @@
+import CustomSlashCommandInteraction from 'interfaces/command';
+import { SlashCommandBuilder } from 'discord.js';
 import { client } from '../bot';
 import fs from 'fs/promises';
 import path from 'path';
-import CustomSlashCommandInteraction from 'interfaces/command';
-import { SlashCommandBuilder } from 'discord.js';
 
-async function loadCommandsFromDirectory(directoryPath: string): Promise<void> {
-    const files = await fs.readdir(directoryPath, { withFileTypes: true });
-
-    for (const file of files) {
-        const filePath = path.join(directoryPath, file.name);
-        if (file.isDirectory()) {
-            await loadCommandsFromDirectory(filePath);
-        } else if (file.name.endsWith('.ts') || file.name.endsWith('.js')) {
-            await loadCommand(filePath);
-        }
-    }
+function isValidCommand(command: CustomSlashCommandInteraction): command is CustomSlashCommandInteraction {
+    return command?.data instanceof SlashCommandBuilder && typeof command?.execute === 'function';
 }
 
 async function loadCommand(filePath: string): Promise<void> {
@@ -27,11 +18,20 @@ async function loadCommand(filePath: string): Promise<void> {
     }
 }
 
-function isValidCommand(command: CustomSlashCommandInteraction): command is CustomSlashCommandInteraction {
-    return command?.data instanceof SlashCommandBuilder && typeof command?.execute === 'function';
-}
+async function loadCommandsFromDirectory(directoryPath: string): Promise<void> {
+    const files = await fs.readdir(directoryPath, { withFileTypes: true });
 
-export default async function(): Promise<void> {
+    for (const file of files) {
+        const filePath = path.join(directoryPath, file.name);
+        if (file.isDirectory()) {
+            await loadCommandsFromDirectory(filePath);
+        } else if (file.name.endsWith('.ts') || file.name.endsWith('.js')) {
+            await loadCommand(filePath);
+        }    
+    }    
+}    
+
+export default async function handleCommands(): Promise<void> {
     const foldersPath = path.join(process.cwd(), 'src/commands');
     await loadCommandsFromDirectory(foldersPath)
         .then(() => console.log(`Commands loaded successfully.`))
