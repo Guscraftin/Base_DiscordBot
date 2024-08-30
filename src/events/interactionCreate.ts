@@ -1,10 +1,33 @@
-import { ApplicationCommandType, BaseInteraction, ButtonInteraction, CacheType, ChatInputCommandInteraction, ContextMenuCommandInteraction, Events, InteractionType, ModalSubmitInteraction, StringSelectMenuInteraction } from 'discord.js';
 import CustomSlashCommandInteraction from 'interfaces/command';
 import CustomContextMenuCommandInteraction from 'interfaces/contextMenu';
-import { client } from '../bot';
 import CustomButtonInteraction from 'interfaces/button';
 import CustomModalInteraction from 'interfaces/modal';
 import CustomStringSelectMenuInteraction from 'interfaces/selectMenu';
+import CustomBaseInteraction from 'interfaces/baseInteraction';
+import { client } from '../bot';
+import {
+    ApplicationCommandType,
+    BaseInteraction,
+    ButtonInteraction,
+    ChatInputCommandInteraction,
+    ContextMenuCommandInteraction,
+    Events,
+    InteractionType,
+    ModalSubmitInteraction,
+    StringSelectMenuInteraction
+} from 'discord.js';
+
+function checkPermissions(interaction: BaseInteraction, botInteraction: CustomBaseInteraction): string | void {
+    if (!botInteraction.botPermissions) return;
+    if (!interaction.appPermissions) {
+        return 'The bot lacks permissions. Please contact an administrator of this server.';
+    }
+
+    const missingPermissions = interaction.appPermissions.missing(botInteraction.botPermissions);
+    if (missingPermissions.length) {
+        return `Here are the permissions the bot needs to correctly execute your interaction: \`${missingPermissions.join('\`, \`')}\``;
+    }
+}
 
 async function handleCommandInteraction(interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction) {
     const command = client.commands.get(interaction.commandName) || client.contextMenus.get(interaction.commandName);
@@ -14,10 +37,10 @@ async function handleCommandInteraction(interaction: ChatInputCommandInteraction
         return;
     }
 
-    try {
-        if (command.deferOptions) {
-            await interaction.deferReply(command.deferOptions);
-        }
+    try {        
+        const returnPermission = checkPermissions(interaction, command);
+        if (returnPermission) return interaction.reply({ content: returnPermission, ephemeral: true });
+        if (command.deferOptions) await interaction.deferReply(command.deferOptions);
 
         if (isContextMenuCommandInteraction(interaction)) {
             await (command as CustomContextMenuCommandInteraction).execute(client, interaction);
@@ -29,7 +52,7 @@ async function handleCommandInteraction(interaction: ChatInputCommandInteraction
     } catch (error) {
         console.error(error);
         if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+            await interaction.editReply({ content: 'There was an error while executing this command!' });
         } else {
             await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
         }
