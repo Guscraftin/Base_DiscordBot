@@ -1,7 +1,8 @@
 import { CustomClient } from "bot";
-import { StringSelectMenuInteraction } from "discord.js";
+import { PermissionFlagsBits, StringSelectMenuInteraction } from "discord.js";
 
 module.exports = {
+    botPermissions: [PermissionFlagsBits.AttachFiles],
     deferOptions: { ephemeral: true },
     data: {
         name: "test_selectMenu",

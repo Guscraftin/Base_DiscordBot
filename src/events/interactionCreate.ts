@@ -31,13 +31,12 @@ function checkPermissions(interaction: BaseInteraction, botInteraction: CustomBa
 
 async function handleCommandInteraction(interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction) {
     const command = client.commands.get(interaction.commandName) || client.contextMenus.get(interaction.commandName);
-
-    if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
-        return;
-    }
-
+    
     try {        
+        if (!command) {
+            throw new Error(`No command matching ${interaction.commandName} was found.`);
+        }
+
         const returnPermission = checkPermissions(interaction, command);
         if (returnPermission) return interaction.reply({ content: returnPermission, ephemeral: true });
         if (command.deferOptions) await interaction.deferReply(command.deferOptions);
@@ -77,12 +76,14 @@ async function handleSlashCommandInteraction(interaction: ChatInputCommandIntera
 
 async function handleButtonInteraction(interaction: ButtonInteraction) {
     const button = client.buttons.get(interaction.customId);
-
+    
     try {
         if (!button) {
             throw new Error(`No button matching ${interaction.customId} was found.`);
         }
 
+        const returnPermission = checkPermissions(interaction, button);
+        if (returnPermission) return interaction.reply({ content: returnPermission, ephemeral: true });
         if (button.deferOptions) {
             await interaction.deferReply(button.deferOptions);
         }
@@ -106,6 +107,8 @@ async function handleModalInteraction(interaction: ModalSubmitInteraction) {
             throw new Error(`No modal matching ${interaction.customId} was found.`);
         }
 
+        const returnPermission = checkPermissions(interaction, modal);
+        if (returnPermission) return interaction.reply({ content: returnPermission, ephemeral: true });
         if (modal.deferOptions) {
             await interaction.deferReply(modal.deferOptions);
         }
@@ -129,6 +132,8 @@ async function handleSelectMenuInteraction(interaction: StringSelectMenuInteract
             throw new Error(`No selectMenu matching ${interaction.customId} was found.`);
         }
 
+        const returnPermission = checkPermissions(interaction, selectMenu);
+        if (returnPermission) return interaction.reply({ content: returnPermission, ephemeral: true });
         if (selectMenu.deferOptions) {
             await interaction.deferReply(selectMenu.deferOptions);
         }

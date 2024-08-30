@@ -3,7 +3,7 @@ import { ChatInputCommandInteraction } from "discord.js";
 import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder } from 'discord.js';
 
 module.exports = {
-    botPermissions: [PermissionFlagsBits.Administrator, PermissionFlagsBits.ManageRoles],
+    botPermissions: [PermissionFlagsBits.ManageNicknames, PermissionFlagsBits.SendMessages],
     deferOptions: { ephemeral: true },
     data: new SlashCommandBuilder()
         .setName("test")
