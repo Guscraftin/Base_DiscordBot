@@ -1,4 +1,4 @@
 export default interface CustomBaseInteraction {
-    botPermissions?: bigint[];
-    deferOptions?: { ephemeral: boolean };
+  botPermissions?: bigint[];
+  deferOptions?: { ephemeral: boolean };
 }
