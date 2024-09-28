@@ -17,7 +17,7 @@ export default {
     client: CustomClient,
     interaction: ContextMenuCommandInteraction,
   ) {
-    return await interaction.editReply({
+    return interaction.editReply({
       content: "Here's a test contextual menu that works properly!",
     });
   },

@@ -45,7 +45,10 @@ export default async function handleEvents(
   client: CustomClient,
 ): Promise<void> {
   const foldersPath = path.join(process.cwd(), "src/events");
-  await loadEventsFromDirectory(client, foldersPath)
-    .then(() => console.log(`Events loaded successfully.`))
-    .catch((error) => console.error("Failed to load events: ", error));
+  try {
+    await loadEventsFromDirectory(client, foldersPath);
+    console.log(`Events loaded successfully.`);
+  } catch (error) {
+    console.error("Failed to load events: ", error);
+  }
 }

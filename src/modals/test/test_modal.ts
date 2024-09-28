@@ -9,7 +9,7 @@ export = {
   async execute(client: CustomClient, interaction: ModalSubmitInteraction) {
     const newTest = interaction.fields?.getTextInputValue("newTest");
 
-    return await interaction.editReply({
+    return interaction.editReply({
       content: `Button and modal are conclusive: \`${newTest}\``,
     });
   },

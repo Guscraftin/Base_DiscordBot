@@ -41,7 +41,10 @@ async function loadCommandsFromDirectory(directoryPath: string): Promise<void> {
 
 export default async function handleCommands(): Promise<void> {
   const foldersPath = path.join(process.cwd(), "src/commands");
-  await loadCommandsFromDirectory(foldersPath)
-    .then(() => console.log(`Commands loaded successfully.`))
-    .catch((error) => console.error("Failed to load commands: ", error));
+  try {
+    await loadCommandsFromDirectory(foldersPath);
+    console.log(`Commands loaded successfully.`);
+  } catch (error) {
+    console.error("Failed to load commands: ", error);
+  }
 }

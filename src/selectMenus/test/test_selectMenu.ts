@@ -14,15 +14,15 @@ export default {
     const first = 0;
     switch (interaction.values[first]) {
       case "first_option":
-        return await interaction.editReply({
+        return interaction.editReply({
           content: "You chose the first option!",
         });
       case "second_option":
-        return await interaction.editReply({
+        return interaction.editReply({
           content: "You chose the second option!",
         });
       default:
-        return await interaction.editReply({
+        return interaction.editReply({
           content: "You haven't chosen an option!",
         });
     }

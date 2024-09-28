@@ -43,7 +43,10 @@ async function loadContextMenusFromDirectory(
 
 export default async function handleContextMenus(): Promise<void> {
   const foldersPath = path.join(process.cwd(), "src/contextMenus");
-  await loadContextMenusFromDirectory(foldersPath)
-    .then(() => console.log(`ContextMenus loaded successfully.`))
-    .catch((error) => console.error("Failed to load contextMenus: ", error));
+  try {
+    await loadContextMenusFromDirectory(foldersPath);
+    console.log(`ContextMenus loaded successfully.`);
+  } catch (error) {
+    console.error("Failed to load contextMenus: ", error);
+  }
 }

@@ -69,7 +69,7 @@ function createBotInfoEmbed(
     });
 }
 
-export = {
+export default {
   data: new SlashCommandBuilder()
     .setName("info")
     .setDescription("Display bot information.")

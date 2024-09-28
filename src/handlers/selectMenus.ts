@@ -42,7 +42,10 @@ async function loadSelectMenusFromDirectory(
 
 export default async function handleSelectMenus(): Promise<void> {
   const foldersPath = path.join(process.cwd(), "src/selectMenus");
-  await loadSelectMenusFromDirectory(foldersPath)
-    .then(() => console.log(`SelectMenus loaded successfully.`))
-    .catch((error) => console.error("Failed to load selectMenus: ", error));
+  try {
+    await loadSelectMenusFromDirectory(foldersPath);
+    console.log(`SelectMenus loaded successfully.`);
+  } catch (error) {
+    console.error("Failed to load selectMenus: ", error);
+  }
 }

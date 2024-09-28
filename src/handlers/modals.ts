@@ -40,7 +40,10 @@ async function loadModalsFromDirectory(directoryPath: string): Promise<void> {
 
 export default async function handleModals(): Promise<void> {
   const foldersPath = path.join(process.cwd(), "src/modals");
-  await loadModalsFromDirectory(foldersPath)
-    .then(() => console.log(`Modals loaded successfully.`))
-    .catch((error) => console.error("Failed to load modals: ", error));
+  try {
+    await loadModalsFromDirectory(foldersPath);
+    console.log(`Modals loaded successfully.`);
+  } catch (error) {
+    console.error("Failed to load modals: ", error);
+  }
 }

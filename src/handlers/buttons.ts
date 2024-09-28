@@ -40,7 +40,10 @@ async function loadButtonsFromDirectory(directoryPath: string): Promise<void> {
 
 export default async function handleButtons(): Promise<void> {
   const foldersPath = path.join(process.cwd(), "src/buttons");
-  await loadButtonsFromDirectory(foldersPath)
-    .then(() => console.log(`Buttons loaded successfully.`))
-    .catch((error) => console.error("Failed to load buttons: ", error));
+  try {
+    await loadButtonsFromDirectory(foldersPath);
+    console.log(`Buttons loaded successfully.`);
+  } catch (error) {
+    console.error("Failed to load buttons: ", error);
+  }
 }

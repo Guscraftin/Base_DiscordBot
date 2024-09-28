@@ -33,6 +33,6 @@ export default {
       ),
     );
 
-    return await interaction.showModal(modal);
+    return interaction.showModal(modal);
   },
 };

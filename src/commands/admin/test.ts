@@ -71,7 +71,7 @@ export default {
     const selectMenuRow = createSelectMenuRow();
     const embed = createEmbed(interaction);
 
-    await interaction.editReply({
+    return interaction.editReply({
       components: [buttonRow, selectMenuRow],
       content: "Component testing",
       embeds: [embed],
