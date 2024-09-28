@@ -3,6 +3,7 @@ import {
   BaseInteraction,
   ButtonInteraction,
   ChatInputCommandInteraction,
+  Collection,
   ContextMenuCommandInteraction,
   Events,
   InteractionType,
@@ -16,6 +17,8 @@ import CustomModalInteraction from "interfaces/modal";
 import CustomSlashCommandInteraction from "interfaces/command";
 import CustomStringSelectMenuInteraction from "interfaces/selectMenu";
 import { client } from "../bot";
+
+// TODO: Refactor + add cooldowns
 
 function checkPermissions(
   interaction: BaseInteraction,
@@ -64,6 +67,7 @@ async function handleCommandInteraction(
       );
     }
 
+    // Check permissions
     const returnPermission = checkPermissions(interaction, command);
     if (returnPermission) {
       await interaction.reply({
@@ -72,6 +76,38 @@ async function handleCommandInteraction(
       });
       return;
     }
+
+    // Check cooldowns
+    const cooldowns = client.cooldowns;
+
+    if (!cooldowns.has(command.data.name)) {
+      cooldowns.set(command.data.name, new Collection());
+    }
+
+    const now = Date.now();
+    const timestamps = cooldowns.get(command.data.name) as Collection<
+      string,
+      number
+    >;
+    const defaultCooldownDuration = 0;
+    const cooldownAmount =
+      (command.cooldown ?? defaultCooldownDuration) * 1_000;
+
+    if (timestamps.has(interaction.user.id)) {
+      const expirationTime =
+        (timestamps.get(interaction.user.id) ?? 0) + cooldownAmount;
+
+      if (now < expirationTime) {
+        const expiredTimestamp = Math.round(expirationTime / 1_000);
+        await interaction.reply({
+          content: `Please wait, you are currently on cooldown for the command named \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
+          ephemeral: true,
+        });
+        return;
+      }
+    }
+
+    // Check defer options
     if (command.deferOptions) {
       await interaction.deferReply(command.deferOptions);
     }
@@ -89,6 +125,9 @@ async function handleCommandInteraction(
     } else {
       throw new Error(`This command interaction is not valid: ${interaction}`);
     }
+
+    timestamps.set(interaction.user.id, now);
+    setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
   } catch (error) {
     console.error(error);
     if (interaction.replied || interaction.deferred) {

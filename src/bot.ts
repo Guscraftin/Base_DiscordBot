@@ -15,6 +15,7 @@ export interface CustomClient extends Client {
   buttons: Collection<string, CustomButtonInteraction>;
   commands: Collection<string, CustomSlashCommandInteraction>;
   contextMenus: Collection<string, CustomContextMenuCommandInteraction>;
+  cooldowns: Collection<string, Collection<string, number>>;
   modals: Collection<string, CustomModalInteraction>;
   selectMenus: Collection<string, CustomStringSelectMenuInteraction>;
 }
@@ -25,6 +26,7 @@ export const client: CustomClient = new Client({
 client.buttons = new Collection();
 client.commands = new Collection();
 client.contextMenus = new Collection();
+client.cooldowns = new Collection();
 client.modals = new Collection();
 client.selectMenus = new Collection();
 

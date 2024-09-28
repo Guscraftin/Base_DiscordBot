@@ -57,6 +57,7 @@ export default {
     PermissionFlagsBits.ManageNicknames,
     PermissionFlagsBits.SendMessages,
   ],
+  cooldown: 5,
   data: new SlashCommandBuilder()
     .setName("test")
     .setDescription("Allows you to test individual components.")
