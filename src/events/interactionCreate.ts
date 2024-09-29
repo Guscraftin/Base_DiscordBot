@@ -1,11 +1,14 @@
 import {
   ApplicationCommandType,
+  AutocompleteInteraction,
   BaseInteraction,
   ButtonInteraction,
   ChatInputCommandInteraction,
   Collection,
   ContextMenuCommandInteraction,
   Events,
+  Interaction,
+  InteractionDeferReplyOptions,
   InteractionType,
   ModalSubmitInteraction,
   StringSelectMenuInteraction,
@@ -18,7 +21,7 @@ import CustomSlashCommandInteraction from "interfaces/command";
 import CustomStringSelectMenuInteraction from "interfaces/selectMenu";
 import { client } from "../bot";
 
-// TODO: Refactor + add cooldowns
+// TODO: Refactor
 
 function checkPermissions(
   interaction: BaseInteraction,
@@ -41,6 +44,23 @@ function checkPermissions(
   return "";
 }
 
+/**
+ * Handles defer options for interactions EXCEPT for commands / contextMenus.
+ * @param interaction
+ * @param deferOptions
+ * @returns void
+ */
+async function handleDeferOptions(
+  interaction: Interaction,
+  deferOptions?: InteractionDeferReplyOptions,
+) {
+  if (interaction instanceof AutocompleteInteraction) return;
+
+  if (deferOptions) {
+    await interaction.deferReply(deferOptions);
+  }
+}
+
 function isContextMenuCommandInteraction(
   interaction: unknown,
 ): interaction is ContextMenuCommandInteraction {
@@ -53,6 +73,9 @@ function isSlashCommandInteraction(
   return interaction instanceof ChatInputCommandInteraction;
 }
 
+/**
+ * Handles commands and contextMenus interactions.
+ */
 async function handleCommandInteraction(
   interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction,
 ): Promise<void> {
@@ -78,7 +101,11 @@ async function handleCommandInteraction(
     }
 
     // Check cooldowns
-    const cooldowns = client.cooldowns;
+    const cooldowns = client.cooldowns.get("commands") as Collection<
+      string,
+      Collection<string, number>
+    >;
+    console.log("cooldowns", cooldowns);
 
     if (!cooldowns.has(command.data.name)) {
       cooldowns.set(command.data.name, new Collection());
@@ -112,6 +139,7 @@ async function handleCommandInteraction(
       await interaction.deferReply(command.deferOptions);
     }
 
+    // Execute command
     if (isContextMenuCommandInteraction(interaction)) {
       await (command as CustomContextMenuCommandInteraction).execute(
         client,
@@ -126,6 +154,7 @@ async function handleCommandInteraction(
       throw new Error(`This command interaction is not valid: ${interaction}`);
     }
 
+    // Set cooldown
     timestamps.set(interaction.user.id, now);
     setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
   } catch (error) {
@@ -155,6 +184,9 @@ async function handleSlashCommandInteraction(
   await handleCommandInteraction(interaction);
 }
 
+/**
+ * Handles buttons interactions.
+ */
 async function handleButtonInteraction(
   interaction: ButtonInteraction,
 ): Promise<void> {
@@ -165,6 +197,7 @@ async function handleButtonInteraction(
       throw new Error(`No button matching ${interaction.customId} was found.`);
     }
 
+    // Check permissions
     const returnPermission = checkPermissions(interaction, button);
     if (returnPermission) {
       await interaction.reply({
@@ -173,11 +206,49 @@ async function handleButtonInteraction(
       });
       return;
     }
-    if (button.deferOptions) {
-      await interaction.deferReply(button.deferOptions);
+
+    // Check cooldowns
+    const cooldowns = client.cooldowns.get("buttons") as Collection<
+      string,
+      Collection<string, number>
+    >;
+    console.log(cooldowns);
+
+    if (!cooldowns.has(button.data.name)) {
+      cooldowns.set(button.data.name, new Collection());
     }
 
+    const now = Date.now();
+    const timestamps = cooldowns.get(button.data.name) as Collection<
+      string,
+      number
+    >;
+    const defaultCooldownDuration = 0;
+    const cooldownAmount = (button.cooldown ?? defaultCooldownDuration) * 1_000;
+
+    if (timestamps.has(interaction.user.id)) {
+      const expirationTime =
+        (timestamps.get(interaction.user.id) ?? 0) + cooldownAmount;
+
+      if (now < expirationTime) {
+        const expiredTimestamp = Math.round(expirationTime / 1_000);
+        await interaction.reply({
+          content: `Please wait, you are currently on cooldown for the button named \`${button.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
+          ephemeral: true,
+        });
+        return;
+      }
+    }
+
+    // Check defer options
+    await handleDeferOptions(interaction, button.deferOptions);
+
+    // Execute button
     await (button as CustomButtonInteraction).execute(client, interaction);
+
+    // Set cooldown
+    timestamps.set(interaction.user.id, now);
+    setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
   } catch (error) {
     console.error(error);
     if (interaction.replied || interaction.deferred) {
@@ -194,6 +265,9 @@ async function handleButtonInteraction(
   }
 }
 
+/**
+ * Handles modals interactions.
+ */
 async function handleModalInteraction(
   interaction: ModalSubmitInteraction,
 ): Promise<void> {
@@ -204,6 +278,7 @@ async function handleModalInteraction(
       throw new Error(`No modal matching ${interaction.customId} was found.`);
     }
 
+    // Check permissions
     const returnPermission = checkPermissions(interaction, modal);
     if (returnPermission) {
       await interaction.reply({
@@ -212,11 +287,48 @@ async function handleModalInteraction(
       });
       return;
     }
-    if (modal.deferOptions) {
-      await interaction.deferReply(modal.deferOptions);
+
+    // Check cooldowns
+    const cooldowns = client.cooldowns.get("modals") as Collection<
+      string,
+      Collection<string, number>
+    >;
+
+    if (!cooldowns.has(modal.data.name)) {
+      cooldowns.set(modal.data.name, new Collection());
     }
 
+    const now = Date.now();
+    const timestamps = cooldowns.get(modal.data.name) as Collection<
+      string,
+      number
+    >;
+    const defaultCooldownDuration = 0;
+    const cooldownAmount = (modal.cooldown ?? defaultCooldownDuration) * 1_000;
+
+    if (timestamps.has(interaction.user.id)) {
+      const expirationTime =
+        (timestamps.get(interaction.user.id) ?? 0) + cooldownAmount;
+
+      if (now < expirationTime) {
+        const expiredTimestamp = Math.round(expirationTime / 1_000);
+        await interaction.reply({
+          content: `Please wait, you are currently on cooldown for the modal named \`${modal.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
+          ephemeral: true,
+        });
+        return;
+      }
+    }
+
+    // Check defer options
+    await handleDeferOptions(interaction, modal.deferOptions);
+
+    // Execute modal
     await (modal as CustomModalInteraction).execute(client, interaction);
+
+    // Set cooldown
+    timestamps.set(interaction.user.id, now);
+    setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
   } catch (error) {
     console.error(error);
     if (interaction.replied || interaction.deferred) {
@@ -233,6 +345,9 @@ async function handleModalInteraction(
   }
 }
 
+/**
+ * Handles selectMenus interactions.
+ */
 async function handleSelectMenuInteraction(
   interaction: StringSelectMenuInteraction,
 ): Promise<void> {
@@ -245,6 +360,7 @@ async function handleSelectMenuInteraction(
       );
     }
 
+    // Check permissions
     const returnPermission = checkPermissions(interaction, selectMenu);
     if (returnPermission) {
       await interaction.reply({
@@ -253,14 +369,52 @@ async function handleSelectMenuInteraction(
       });
       return;
     }
-    if (selectMenu.deferOptions) {
-      await interaction.deferReply(selectMenu.deferOptions);
+
+    // Check cooldowns
+    const cooldowns = client.cooldowns.get("selectMenus") as Collection<
+      string,
+      Collection<string, number>
+    >;
+
+    if (!cooldowns.has(selectMenu.data.name)) {
+      cooldowns.set(selectMenu.data.name, new Collection());
     }
 
+    const now = Date.now();
+    const timestamps = cooldowns.get(selectMenu.data.name) as Collection<
+      string,
+      number
+    >;
+    const defaultCooldownDuration = 0;
+    const cooldownAmount =
+      (selectMenu.cooldown ?? defaultCooldownDuration) * 1_000;
+
+    if (timestamps.has(interaction.user.id)) {
+      const expirationTime =
+        (timestamps.get(interaction.user.id) ?? 0) + cooldownAmount;
+
+      if (now < expirationTime) {
+        const expiredTimestamp = Math.round(expirationTime / 1_000);
+        await interaction.reply({
+          content: `Please wait, you are currently on cooldown for the selectMenu named \`${selectMenu.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
+          ephemeral: true,
+        });
+        return;
+      }
+    }
+
+    // Check defer options
+    await handleDeferOptions(interaction, selectMenu.deferOptions);
+
+    // Execute selectMenu
     await (selectMenu as CustomStringSelectMenuInteraction).execute(
       client,
       interaction,
     );
+
+    // Set cooldown
+    timestamps.set(interaction.user.id, now);
+    setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
   } catch (error) {
     console.error(error);
     if (interaction.replied || interaction.deferred) {

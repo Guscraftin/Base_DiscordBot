@@ -2,16 +2,17 @@ import {
   ApplicationCommandType,
   ContextMenuCommandBuilder,
   ContextMenuCommandInteraction,
+  ContextMenuCommandType,
   PermissionFlagsBits,
 } from "discord.js";
 import { CustomClient } from "bot";
 
 export default {
+  cooldown: 10,
   data: new ContextMenuCommandBuilder()
     .setName("test user")
-    .setType(ApplicationCommandType.User)
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .setDMPermission(false),
+    .setType(ApplicationCommandType.User as ContextMenuCommandType)
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   deferOptions: { ephemeral: true },
   async execute(
     client: CustomClient,

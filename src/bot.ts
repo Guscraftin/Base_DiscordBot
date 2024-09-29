@@ -15,7 +15,7 @@ export interface CustomClient extends Client {
   buttons: Collection<string, CustomButtonInteraction>;
   commands: Collection<string, CustomSlashCommandInteraction>;
   contextMenus: Collection<string, CustomContextMenuCommandInteraction>;
-  cooldowns: Collection<string, Collection<string, number>>;
+  cooldowns: Collection<string, Collection<string, Collection<string, number>>>;
   modals: Collection<string, CustomModalInteraction>;
   selectMenus: Collection<string, CustomStringSelectMenuInteraction>;
 }
@@ -29,6 +29,10 @@ client.contextMenus = new Collection();
 client.cooldowns = new Collection();
 client.modals = new Collection();
 client.selectMenus = new Collection();
+const cooldownTypes = ["buttons", "commands", "modals", "selectMenus"];
+cooldownTypes.forEach((type) => {
+  client.cooldowns.set(type, new Collection());
+});
 
 async function loadHandlers() {
   const handlers = [
