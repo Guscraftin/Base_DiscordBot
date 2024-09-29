@@ -21,8 +21,12 @@ import CustomSlashCommandInteraction from "interfaces/command";
 import CustomStringSelectMenuInteraction from "interfaces/selectMenu";
 import { client } from "../bot";
 
-// TODO: Refactor
-
+/**
+ * Checks if the bot has the necessary permissions to execute an interaction.
+ * @param interaction - The interaction to check permissions for
+ * @param botInteraction - The bot interaction to check permissions for
+ * @returns A string with the missing permissions or an empty string if the bot has the necessary permissions
+ */
 function checkPermissions(
   interaction: BaseInteraction,
   botInteraction: CustomBaseInteraction,
@@ -46,8 +50,8 @@ function checkPermissions(
 
 /**
  * Handles defer options for interactions EXCEPT for commands / contextMenus.
- * @param interaction
- * @param deferOptions
+ * @param interaction - The interaction to handle defer options for
+ * @param deferOptions - Optional defer options
  * @returns void
  */
 async function handleDeferOptions(
@@ -105,7 +109,6 @@ async function handleCommandInteraction(
       string,
       Collection<string, number>
     >;
-    console.log("cooldowns", cooldowns);
 
     if (!cooldowns.has(command.data.name)) {
       cooldowns.set(command.data.name, new Collection());
@@ -212,7 +215,6 @@ async function handleButtonInteraction(
       string,
       Collection<string, number>
     >;
-    console.log(cooldowns);
 
     if (!cooldowns.has(button.data.name)) {
       cooldowns.set(button.data.name, new Collection());
